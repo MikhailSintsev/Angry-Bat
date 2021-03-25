@@ -3,7 +3,6 @@ using UnityEngine;
 public class Bat : MonoBehaviour
 {
     private Collider2D _cachedStickCollider;
-    private LineRenderer _cachedLineRenderer;
     private LineRenderer _cachedFrontRubberBandLR;
     private LineRenderer _cachedBackRubberBandLR;
     private GameObject _cachedFrontRubberBand;
@@ -23,7 +22,6 @@ public class Bat : MonoBehaviour
     private float _upperSideStickBound;
 
     [SerializeField] private float _maxDragDistance = 2f;
-    [SerializeField] private GameObject _lineRenderer;
     [SerializeField] private GameObject _slingshot;
 
     [SerializeField]
@@ -39,7 +37,6 @@ public class Bat : MonoBehaviour
         _cachedRigidbody = GetComponent<Rigidbody2D>();
         _cachedAnimator = GetComponent<Animator>();
 
-        _cachedLineRenderer = _lineRenderer.GetComponent<LineRenderer>();
         _cachedFrontRubberBand = _slingshot.transform.Find("LeftAnchorPoint").gameObject;
         _cachedBackRubberBand = _slingshot.transform.Find("RightAnchorPoint").gameObject;
         _cachedFrontRubberBandLR = _cachedFrontRubberBand.GetComponent<LineRenderer>();
@@ -50,19 +47,11 @@ public class Bat : MonoBehaviour
         //_cachedAnimator.enabled = false;
 
         StickBounds();
-
-        _cachedFrontRubberBandLR.SetPosition(0, _slingshot.transform.Find("LeftAnchorPoint").position);
-        _cachedFrontRubberBandLR.SetPosition(1, _projectilePosition - _cachedCollider.bounds.extents / 2);
-
-        _cachedBackRubberBandLR.SetPosition(0, _slingshot.transform.Find("RightAnchorPoint").position);
-        _cachedBackRubberBandLR.SetPosition(1, _projectilePosition - _cachedCollider.bounds.extents / 2);
+        RubberBandJunctionPoint(_projectilePosition);
     }
 
     private void Update()
     {
-        _cachedLineRenderer.SetPosition(0, transform.position);
-        _cachedLineRenderer.SetPosition(1, _projectilePosition);
-
         if (_wasLaunched && _cachedRigidbody.velocity.magnitude <= 0.05)
             _timer += Time.deltaTime;
         else
@@ -103,6 +92,15 @@ public class Bat : MonoBehaviour
             + _cachedStickCollider.bounds.extents.y + _cachedCollider.bounds.extents.y;
     }
 
+    private void RubberBandJunctionPoint(Vector3 position)
+    {
+        _cachedFrontRubberBandLR.SetPosition(0, _slingshot.transform.Find("LeftAnchorPoint").position);
+        _cachedFrontRubberBandLR.SetPosition(1, position - _cachedCollider.bounds.extents / 2);
+
+        _cachedBackRubberBandLR.SetPosition(0, _slingshot.transform.Find("RightAnchorPoint").position);
+        _cachedBackRubberBandLR.SetPosition(1, position - _cachedCollider.bounds.extents / 2);
+    }
+
     private void OnMouseDown()
     {
         if (!_wasLaunched)
@@ -116,7 +114,6 @@ public class Bat : MonoBehaviour
     {
         if (!_wasLaunched)
         {
-            _cachedLineRenderer.enabled = true;
             Vector3 newPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 desiredPosition = new Vector3(newPosition.x, newPosition.y);
 
@@ -144,11 +141,7 @@ public class Bat : MonoBehaviour
             
             transform.position = desiredPosition;
 
-            _cachedFrontRubberBandLR.SetPosition(0, _slingshot.transform.Find("LeftAnchorPoint").position);
-            _cachedFrontRubberBandLR.SetPosition(1, transform.position - _cachedCollider.bounds.extents / 2);
-
-            _cachedBackRubberBandLR.SetPosition(0, _slingshot.transform.Find("RightAnchorPoint").position);
-            _cachedBackRubberBandLR.SetPosition(1, transform.position - _cachedCollider.bounds.extents / 2);
+            RubberBandJunctionPoint(transform.position);
         }
     }
 
@@ -156,18 +149,13 @@ public class Bat : MonoBehaviour
     {
         if (!_wasLaunched)
         {
-            _cachedFrontRubberBandLR.SetPosition(0, _slingshot.transform.Find("LeftAnchorPoint").position);
-            _cachedFrontRubberBandLR.SetPosition(1, _projectilePosition - _cachedCollider.bounds.extents / 2);
-
-            _cachedBackRubberBandLR.SetPosition(0, _slingshot.transform.Find("RightAnchorPoint").position);
-            _cachedBackRubberBandLR.SetPosition(1, _projectilePosition - _cachedCollider.bounds.extents / 2);
+            RubberBandJunctionPoint(_projectilePosition);
 
             _cachedRenderer.color = Color.white;
             _directionToInitialPosition = _projectilePosition - transform.position;
             _cachedRigidbody.gravityScale = 1;
             _cachedRigidbody.AddForce(_directionToInitialPosition * _launchPower);
             _wasLaunched = true;
-            _cachedLineRenderer.enabled = false;
         }
     }
 }

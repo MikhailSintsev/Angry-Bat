@@ -2,24 +2,17 @@ using UnityEngine;
 
 public class Bat : MonoBehaviour
 {
-    private Collider2D _cachedStickCollider;
-    private LineRenderer _cachedFrontRubberBandLR;
-    private LineRenderer _cachedBackRubberBandLR;
-    private GameObject _cachedFrontRubberBand;
-    private GameObject _cachedBackRubberBand;
-    private SpriteRenderer _cachedRenderer;
-    private Rigidbody2D _cachedRigidbody;
-    private Animator _cachedAnimator;
-    private Collider2D _cachedCollider;
+    private SpriteRenderer _cached_Renderer;
+    private Rigidbody2D _cached_Rigidbody;
+    private Animator _cached_Animator;
+
+    private Collider2D _cached_StickCollider;
 
     private Vector3 _directionToInitialPosition;
     private Vector3 _projectilePosition;
     private bool _wasLaunched;
     private float _timer;
-    private float _bound = 30f;
-    private float _leftSideStickBound;
-    private float _rightSideStickBound;
-    private float _upperSideStickBound;
+    private float _worldBound = 30f;
 
     [SerializeField] private float _maxDragDistance = 2f;
     [SerializeField] private GameObject _slingshot;
@@ -28,31 +21,28 @@ public class Bat : MonoBehaviour
     [Range(50, 1000)]
     [Tooltip("Set the launch power")]
     private int _launchPower;
+    private Slingshot _slingshotScript;
 
     private void Awake()
     {
-        _cachedStickCollider = _slingshot.GetComponentInChildren<Collider2D>();
-        _cachedCollider = GetComponent<Collider2D>();
-        _cachedRenderer = GetComponent<SpriteRenderer>();
-        _cachedRigidbody = GetComponent<Rigidbody2D>();
-        _cachedAnimator = GetComponent<Animator>();
+        _slingshotScript = _slingshot.GetComponent<Slingshot>();
+        
+        _cached_Renderer = GetComponent<SpriteRenderer>();
+        _cached_Rigidbody = GetComponent<Rigidbody2D>();
+        _cached_Animator = GetComponent<Animator>();
+    }
 
-        _cachedFrontRubberBand = _slingshot.transform.Find("LeftAnchorPoint").gameObject;
-        _cachedBackRubberBand = _slingshot.transform.Find("RightAnchorPoint").gameObject;
-        _cachedFrontRubberBandLR = _cachedFrontRubberBand.GetComponent<LineRenderer>();
-        _cachedBackRubberBandLR = _cachedBackRubberBand.GetComponent<LineRenderer>();
-
+    private void Start()
+    {
+        _cached_StickCollider = _slingshotScript.Cached_StickCollider;
         _projectilePosition = _slingshot.transform.Find("ProjectilePosition").position;
+        _slingshotScript.RubberBandJunctionPoint(_projectilePosition);
         transform.position = _projectilePosition;
-        //_cachedAnimator.enabled = false;
-
-        StickBounds();
-        RubberBandJunctionPoint(_projectilePosition);
     }
 
     private void Update()
     {
-        if (_wasLaunched && _cachedRigidbody.velocity.magnitude <= 0.05)
+        if (_wasLaunched && _cached_Rigidbody.velocity.magnitude <= 0.05)
             _timer += Time.deltaTime;
         else
             _timer = 0;
@@ -63,10 +53,10 @@ public class Bat : MonoBehaviour
 
     private bool OutOfBounds()
     {
-        if (transform.position.x <= -_bound
-            || transform.position.x >= _bound
-            || transform.position.y <= -_bound
-            || transform.position.y >= _bound)
+        if (transform.position.x <= -_worldBound
+            || transform.position.x >= _worldBound
+            || transform.position.y <= -_worldBound
+            || transform.position.y >= _worldBound)
         {
             return true;
         }
@@ -80,33 +70,12 @@ public class Bat : MonoBehaviour
         return false;
     }
 
-    private void StickBounds()
-    {
-        _leftSideStickBound = _cachedStickCollider.transform.position.x
-            - _cachedStickCollider.bounds.extents.x - _cachedCollider.bounds.extents.x;
-
-        _rightSideStickBound = _cachedStickCollider.transform.position.x
-            + _cachedStickCollider.bounds.extents.x + _cachedCollider.bounds.extents.x;
-
-        _upperSideStickBound = _cachedStickCollider.transform.position.y
-            + _cachedStickCollider.bounds.extents.y + _cachedCollider.bounds.extents.y;
-    }
-
-    private void RubberBandJunctionPoint(Vector3 position)
-    {
-        _cachedFrontRubberBandLR.SetPosition(0, _slingshot.transform.Find("LeftAnchorPoint").position);
-        _cachedFrontRubberBandLR.SetPosition(1, position - _cachedCollider.bounds.extents / 2);
-
-        _cachedBackRubberBandLR.SetPosition(0, _slingshot.transform.Find("RightAnchorPoint").position);
-        _cachedBackRubberBandLR.SetPosition(1, position - _cachedCollider.bounds.extents / 2);
-    }
-
     private void OnMouseDown()
     {
         if (!_wasLaunched)
         {
-            _cachedRenderer.color = Color.red;
-            _cachedAnimator.enabled = true;
+            _cached_Renderer.color = Color.red;
+            _cached_Animator.enabled = true;
         }
     }
 
@@ -117,7 +86,7 @@ public class Bat : MonoBehaviour
             Vector3 newPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 desiredPosition = new Vector3(newPosition.x, newPosition.y);
 
-            float distance = Vector3.Distance(desiredPosition, _projectilePosition);            
+            float distance = Vector3.Distance(desiredPosition, _projectilePosition);
 
             if (distance >= _maxDragDistance)
             {
@@ -126,22 +95,22 @@ public class Bat : MonoBehaviour
                 desiredPosition = _projectilePosition + (direction * _maxDragDistance);
             }
 
-            if (desiredPosition.x >= _leftSideStickBound
-                && desiredPosition.x <= _cachedStickCollider.transform.position.x
-                && desiredPosition.y <= _upperSideStickBound)
+            if (desiredPosition.x >= _slingshotScript.LeftSideStickBound
+                && desiredPosition.x <= _cached_StickCollider.transform.position.x
+                && desiredPosition.y <= _slingshotScript.UpperSideStickBound)
             {
-                desiredPosition.x = _leftSideStickBound;
+                desiredPosition.x = _slingshotScript.LeftSideStickBound;
             }
-            else if (desiredPosition.x >= _cachedStickCollider.transform.position.x
-                && desiredPosition.x <= _rightSideStickBound
-                && desiredPosition.y <= _upperSideStickBound)
+            else if (desiredPosition.x >= _cached_StickCollider.transform.position.x
+                && desiredPosition.x <= _slingshotScript.RightSideStickBound
+                && desiredPosition.y <= _slingshotScript.UpperSideStickBound)
             {
-                desiredPosition.x = _rightSideStickBound;
+                desiredPosition.x = _slingshotScript.RightSideStickBound;
             }
-            
+
             transform.position = desiredPosition;
 
-            RubberBandJunctionPoint(transform.position);
+            _slingshotScript.RubberBandJunctionPoint(transform.position);
         }
     }
 
@@ -149,12 +118,12 @@ public class Bat : MonoBehaviour
     {
         if (!_wasLaunched)
         {
-            RubberBandJunctionPoint(_projectilePosition);
+            _slingshotScript.RubberBandJunctionPoint(_projectilePosition);
 
-            _cachedRenderer.color = Color.white;
+            _cached_Renderer.color = Color.white;
             _directionToInitialPosition = _projectilePosition - transform.position;
-            _cachedRigidbody.gravityScale = 1;
-            _cachedRigidbody.AddForce(_directionToInitialPosition * _launchPower);
+            _cached_Rigidbody.gravityScale = 1;
+            _cached_Rigidbody.AddForce(_directionToInitialPosition * _launchPower);
             _wasLaunched = true;
         }
     }

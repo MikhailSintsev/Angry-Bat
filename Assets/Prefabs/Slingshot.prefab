@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1236244650}
   - component: {fileID: 1236244651}
-  - component: {fileID: 1514277828}
+  - component: {fileID: 1153510968}
   m_Layer: 0
   m_Name: StickCollider
   m_TagString: Untagged
@@ -83,8 +83,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!61 &1514277828
-BoxCollider2D:
+--- !u!68 &1153510968
+EdgeCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -97,18 +97,18 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 2}
-    newSize: {x: 1, y: 2}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 2.75, y: 1.8}
   m_EdgeRadius: 0
+  m_Points:
+  - {x: -0.560194, y: 0.9}
+  - {x: -0.40240288, y: -0.77667695}
+  - {x: 1.5733262, y: -0.7982}
+  - {x: -1.16, y: -0.7982003}
+  - {x: -1.1609554, y: 0.9}
+  - {x: -0.5636351, y: 0.9}
+  m_AdjacentStartPoint: {x: 0, y: 0}
+  m_AdjacentEndPoint: {x: 0, y: 0}
+  m_UseAdjacentStartPoint: 0
+  m_UseAdjacentEndPoint: 0
 --- !u!1 &894830213124075009
 GameObject:
   m_ObjectHideFlags: 0
@@ -236,7 +236,7 @@ LineRenderer:
     textureMode: 0
     shadowBias: 0.5
     generateLightingData: 0
-  m_UseWorldSpace: 1
+  m_UseWorldSpace: 0
   m_Loop: 0
 --- !u!1 &3005875102831287414
 GameObject:
@@ -311,7 +311,7 @@ LineRenderer:
   m_SortingOrder: 2
   m_Positions:
   - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 1}
+  - {x: 0, y: 0, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -365,7 +365,7 @@ LineRenderer:
     textureMode: 0
     shadowBias: 0.5
     generateLightingData: 0
-  m_UseWorldSpace: 1
+  m_UseWorldSpace: 0
   m_Loop: 0
 --- !u!1 &3925255696697250990
 GameObject:

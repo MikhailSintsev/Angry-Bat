@@ -17,9 +17,13 @@ public class Slingshot : MonoBehaviour
     private void Awake()
     {
         _cached_batCollider = _bat.GetComponent<Collider2D>();
+        Cached_StickCollider = GetComponentInChildren<Collider2D>();
+
         _cached_FrontRubberBandLR = transform.Find("LeftAnchorPoint").GetComponent<LineRenderer>();
         _cached_BackRubberBandLR = transform.Find("RightAnchorPoint").GetComponent<LineRenderer>();
-        Cached_StickCollider = GetComponentInChildren<Collider2D>();
+
+        _cached_FrontRubberBandLR.useWorldSpace = true;
+        _cached_BackRubberBandLR.useWorldSpace = true;
 
         StickBounds();
     }

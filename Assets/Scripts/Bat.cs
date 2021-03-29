@@ -8,7 +8,7 @@ public class Bat : MonoBehaviour
 
     private Collider2D _cached_StickCollider;
 
-    private Vector3 _directionToInitialPosition;
+    private Vector3 _directionToProjectilePosition;
     private Vector3 _projectilePosition;
     private bool _wasLaunched;
     private float _timer;
@@ -121,10 +121,15 @@ public class Bat : MonoBehaviour
             _slingshotScript.RubberBandJunctionPoint(_projectilePosition);
 
             _cached_Renderer.color = Color.white;
-            _directionToInitialPosition = _projectilePosition - transform.position;
+            _directionToProjectilePosition = _projectilePosition - transform.position;
             _cached_Rigidbody.gravityScale = 1;
-            _cached_Rigidbody.AddForce(_directionToInitialPosition * _launchPower);
+            _cached_Rigidbody.AddForce(_directionToProjectilePosition * _launchPower);
             _wasLaunched = true;
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        _cached_Animator.SetBool("CanFly", false);
     }
 }

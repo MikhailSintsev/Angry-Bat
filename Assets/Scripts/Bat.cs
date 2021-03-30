@@ -5,31 +5,37 @@ public class Bat : MonoBehaviour
     private SpriteRenderer _cached_Renderer;
     private Rigidbody2D _cached_Rigidbody;
     private Animator _cached_Animator;
+    private AudioSource _cached_AudioSource;
 
     private Collider2D _cached_StickCollider;
 
     private Vector3 _directionToProjectilePosition;
     private Vector3 _projectilePosition;
     private bool _wasLaunched;
+    private bool _played;
     private float _timer;
-    private float _worldBound = 30f;
+    private float _worldBound = 40f;
+
+    [SerializeField] AudioClip bat_fly;
+    [SerializeField] AudioClip stretch;
 
     [SerializeField] private float _maxDragDistance = 2f;
     [SerializeField] private GameObject _slingshot;
-
     [SerializeField]
     [Range(50, 1000)]
     [Tooltip("Set the launch power")]
     private int _launchPower;
+
     private Slingshot _slingshotScript;
 
     private void Awake()
     {
         _slingshotScript = _slingshot.GetComponent<Slingshot>();
-        
+
         _cached_Renderer = GetComponent<SpriteRenderer>();
         _cached_Rigidbody = GetComponent<Rigidbody2D>();
         _cached_Animator = GetComponent<Animator>();
+        _cached_AudioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -83,6 +89,12 @@ public class Bat : MonoBehaviour
     {
         if (!_wasLaunched)
         {
+            if (!_played)
+            {
+                _cached_AudioSource.PlayOneShot(stretch, 0.5f);
+                _played = true;
+            }
+
             Vector3 newPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 desiredPosition = new Vector3(newPosition.x, newPosition.y);
 
@@ -118,6 +130,7 @@ public class Bat : MonoBehaviour
     {
         if (!_wasLaunched)
         {
+            _cached_AudioSource.PlayOneShot(bat_fly, 0.5f);
             _slingshotScript.RubberBandJunctionPoint(_projectilePosition);
 
             _cached_Renderer.color = Color.white;

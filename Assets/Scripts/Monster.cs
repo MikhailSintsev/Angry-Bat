@@ -4,14 +4,19 @@ public class Monster : MonoBehaviour
 {
     [SerializeField] private GameObject _cloudParticlePrefab;
 
-    private Rigidbody2D _cachedRigidbody;
+    private Rigidbody2D _cached_Rigidbody;
+    private AudioSource _cached_AudioSource;
     private bool _isFalling;
 
-    private void Awake() => _cachedRigidbody = GetComponent<Rigidbody2D>();
+    private void Awake()
+    {
+        _cached_Rigidbody = GetComponent<Rigidbody2D>();
+        _cached_AudioSource = GetComponent<AudioSource>();
+    }
 
     private void Update()
     {
-        if (_cachedRigidbody.velocity.magnitude >= 4f)
+        if (_cached_Rigidbody.velocity.magnitude >= 4f)
             _isFalling = true;
     }
 
@@ -19,16 +24,16 @@ public class Monster : MonoBehaviour
     {
         Bat bat = collision.collider.GetComponent<Bat>();
 
+        if (!bat && _cached_Rigidbody.velocity.magnitude >= 0.3f && !_cached_AudioSource.isPlaying)
+        {
+            _cached_AudioSource.Play();
+        }
+
         if (bat != null)
         {
             Die();
             return;
         }
-
-        //Monster monster = collision.collider.GetComponent<Monster>();
-
-        //if (monster != null)
-        //    return;
 
         if (_isFalling)
         {

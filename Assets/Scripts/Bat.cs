@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Bat : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class Bat : MonoBehaviour
     private AudioSource _cached_AudioSource;
 
     private Collider2D _cached_StickCollider;
+    private Slingshot _slingshotScript;
 
     private Vector3 _directionToProjectilePosition;
     private Vector3 _projectilePosition;
@@ -16,17 +18,20 @@ public class Bat : MonoBehaviour
     private float _timer;
     private float _worldBound = 40f;
 
-    [SerializeField] AudioClip bat_fly;
-    [SerializeField] AudioClip stretch;
+    [SerializeField] private AudioClip _bat_fly;
+    [SerializeField] private AudioClip _stretch;
 
+    [SerializeField] private float _prelaunchFlySpeed = 5f;
     [SerializeField] private float _maxDragDistance = 2f;
+
+    [SerializeField] private GameObject _feathersParticlePrefab;
     [SerializeField] private GameObject _slingshot;
+    [SerializeField] private GameObject _startPoint;
+
     [SerializeField]
     [Range(50, 1000)]
     [Tooltip("Set the launch power")]
     private int _launchPower;
-
-    private Slingshot _slingshotScript;
 
     private void Awake()
     {
@@ -43,7 +48,25 @@ public class Bat : MonoBehaviour
         _cached_StickCollider = _slingshotScript.Cached_StickCollider;
         _projectilePosition = _slingshot.transform.Find("ProjectilePosition").position;
         _slingshotScript.RubberBandJunctionPoint(_projectilePosition);
-        transform.position = _projectilePosition;
+
+        StartCoroutine("Respawn");
+    }
+
+    private IEnumerator Respawn()
+    {
+        _wasLaunched = false;
+        _cached_Rigidbody.gravityScale = 0;
+        transform.position = _startPoint.transform.position;
+        transform.rotation = _startPoint.transform.rotation;
+        _cached_Animator.SetBool("CanFly", true);
+
+        yield return new WaitForSeconds(0.4f);
+
+        while (Vector3.Distance(transform.position, _projectilePosition) > float.Epsilon)
+        {
+            transform.position = Vector3.Lerp(transform.position, _projectilePosition, Time.deltaTime * _prelaunchFlySpeed);
+            yield return null;
+        }
     }
 
     private void Update()
@@ -54,7 +77,10 @@ public class Bat : MonoBehaviour
             _timer = 0;
 
         if (OutOfBounds() || TimeAfterStopIsUp())
-            Scene.ReloadScene();
+        {
+            Destroy(Instantiate(_feathersParticlePrefab, transform.position, Quaternion.identity), 3);
+            StartCoroutine("Respawn");
+        }
     }
 
     private bool OutOfBounds()
@@ -71,13 +97,14 @@ public class Bat : MonoBehaviour
 
     private bool TimeAfterStopIsUp()
     {
-        if (_timer >= 4)
+        if (_timer >= 3)
             return true;
         return false;
     }
 
     private void OnMouseDown()
     {
+        StopCoroutine("Respawn");
         if (!_wasLaunched)
         {
             _cached_Renderer.color = Color.red;
@@ -91,7 +118,7 @@ public class Bat : MonoBehaviour
         {
             if (!_played)
             {
-                _cached_AudioSource.PlayOneShot(stretch, 0.5f);
+                _cached_AudioSource.PlayOneShot(_stretch, 0.5f);
                 _played = true;
             }
 
@@ -130,7 +157,9 @@ public class Bat : MonoBehaviour
     {
         if (!_wasLaunched)
         {
-            _cached_AudioSource.PlayOneShot(bat_fly, 0.5f);
+            _cached_AudioSource.Stop();
+            _cached_AudioSource.PlayOneShot(_bat_fly, 0.5f);
+
             _slingshotScript.RubberBandJunctionPoint(_projectilePosition);
 
             _cached_Renderer.color = Color.white;

@@ -47,7 +47,7 @@ public class Monster : MonoBehaviour
     
     private void Die()
     {
-        Instantiate(_cloudParticlePrefab, transform.position, Quaternion.identity);
+        Destroy(Instantiate(_cloudParticlePrefab, transform.position, Quaternion.identity), 3);
         Destroy(gameObject);
     }
 }

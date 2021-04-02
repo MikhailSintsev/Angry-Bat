@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Bat : MonoBehaviour
 {
+    public float distance = 0f;
+
     private SpriteRenderer _cached_Renderer;
     private Rigidbody2D _cached_Rigidbody;
     private Animator _cached_Animator;
@@ -14,15 +16,15 @@ public class Bat : MonoBehaviour
     private Vector3 _directionToProjectilePosition;
     private Vector3 _projectilePosition;
     private bool _wasLaunched;
-    private bool _played;
+    private bool _stretchSoundWasPlayed;
+    private bool _respawned;
     private float _timer;
-    private float _worldBound = 40f;
+    private float _worldBound = 30f;
+    private float _prelaunchFlySpeed = 8f;
+    private float _maxDragDistance = 1.5f;
 
     [SerializeField] private AudioClip _bat_fly;
     [SerializeField] private AudioClip _stretch;
-
-    [SerializeField] private float _prelaunchFlySpeed = 5f;
-    [SerializeField] private float _maxDragDistance = 2f;
 
     [SerializeField] private GameObject _feathersParticlePrefab;
     [SerializeField] private GameObject _slingshot;
@@ -55,6 +57,7 @@ public class Bat : MonoBehaviour
     private IEnumerator Respawn()
     {
         _wasLaunched = false;
+        _stretchSoundWasPlayed = false;
         _cached_Rigidbody.gravityScale = 0;
         transform.position = _startPoint.transform.position;
         transform.rotation = _startPoint.transform.rotation;
@@ -62,7 +65,7 @@ public class Bat : MonoBehaviour
 
         yield return new WaitForSeconds(0.4f);
 
-        while (Vector3.Distance(transform.position, _projectilePosition) > float.Epsilon)
+        while (Vector3.Distance(transform.position, _projectilePosition) > 0.01f)
         {
             transform.position = Vector3.Lerp(transform.position, _projectilePosition, Time.deltaTime * _prelaunchFlySpeed);
             yield return null;
@@ -71,15 +74,20 @@ public class Bat : MonoBehaviour
 
     private void Update()
     {
+        distance = Vector3.Distance(transform.position, _projectilePosition);
         if (_wasLaunched && _cached_Rigidbody.velocity.magnitude <= 0.05)
             _timer += Time.deltaTime;
         else
             _timer = 0;
-
-        if (OutOfBounds() || TimeAfterStopIsUp())
+        if (!_respawned)
         {
-            Destroy(Instantiate(_feathersParticlePrefab, transform.position, Quaternion.identity), 3);
-            StartCoroutine("Respawn");
+            if (OutOfBounds() || TimeAfterStopIsUp())
+            {
+                _cached_Rigidbody.constraints = RigidbodyConstraints2D.None;
+                Destroy(Instantiate(_feathersParticlePrefab, transform.position, Quaternion.identity), 3);
+                StartCoroutine("Respawn");
+                _respawned = true;
+            }
         }
     }
 
@@ -90,6 +98,7 @@ public class Bat : MonoBehaviour
             || transform.position.y <= -_worldBound
             || transform.position.y >= _worldBound)
         {
+            _cached_Rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
             return true;
         }
         return false;
@@ -116,10 +125,10 @@ public class Bat : MonoBehaviour
     {
         if (!_wasLaunched)
         {
-            if (!_played)
+            if (!_stretchSoundWasPlayed)
             {
                 _cached_AudioSource.PlayOneShot(_stretch, 0.5f);
-                _played = true;
+                _stretchSoundWasPlayed = true;
             }
 
             Vector3 newPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -167,6 +176,7 @@ public class Bat : MonoBehaviour
             _cached_Rigidbody.gravityScale = 1;
             _cached_Rigidbody.AddForce(_directionToProjectilePosition * _launchPower);
             _wasLaunched = true;
+            _respawned = false;
         }
     }
 

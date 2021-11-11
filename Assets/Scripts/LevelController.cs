@@ -44,7 +44,7 @@ public class LevelController : MonoBehaviour
             {
                 if (!_showGameOverMessage)
                 {
-                    Debug.Log("It is all!");
+                    Debug.Log("It's all!");
                     _showGameOverMessage = true;
                 }
             }

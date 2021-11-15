@@ -353,10 +353,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1236244651, guid: 2135f6bd0470a834c90502d235b15b52, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2033280845, guid: 2135f6bd0470a834c90502d235b15b52, type: 3}
       propertyPath: _bat
       value: 
       objectReference: {fileID: 421834704}
+    - target: {fileID: 435561041952356837, guid: 2135f6bd0470a834c90502d235b15b52, type: 3}
+      propertyPath: m_UseWorldSpace
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2899601579487854776, guid: 2135f6bd0470a834c90502d235b15b52, type: 3}
+      propertyPath: m_UseWorldSpace
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3925255696697250990, guid: 2135f6bd0470a834c90502d235b15b52, type: 3}
       propertyPath: m_Name
       value: Slingshot
@@ -659,10 +671,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3271033092598191092, guid: c9bc382a35629a0429f9ac4a8bc86e01, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.1
+      objectReference: {fileID: 0}
     - target: {fileID: 3271033092598191095, guid: c9bc382a35629a0429f9ac4a8bc86e01, type: 3}
       propertyPath: m_Follow
       value: 
       objectReference: {fileID: 1117249742}
+    - target: {fileID: 3271033092861674378, guid: c9bc382a35629a0429f9ac4a8bc86e01, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.0205092
+      objectReference: {fileID: 0}
+    - target: {fileID: 3271033092861674378, guid: c9bc382a35629a0429f9ac4a8bc86e01, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.00006914139
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c9bc382a35629a0429f9ac4a8bc86e01, type: 3}
 --- !u!1001 &8099212147859401603
@@ -789,6 +813,10 @@ PrefabInstance:
     - target: {fileID: 9121613315547998337, guid: 59faefd3cac2f7243ac118b9c918af2f, type: 3}
       propertyPath: m_Name
       value: Grey Bat
+      objectReference: {fileID: 0}
+    - target: {fileID: 9121613315547998337, guid: 59faefd3cac2f7243ac118b9c918af2f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9121613315547998340, guid: 59faefd3cac2f7243ac118b9c918af2f, type: 3}
       propertyPath: m_RootOrder

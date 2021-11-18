@@ -1,15 +1,76 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    public int currentLevelIndex;
+    public Animator overlayAnimator;
+    public Bat batScript;
+    public TMP_Text scoreText;
+
+    private Monster[] _monsters;
+    private bool _showGameOverMessage;
+
+    private void OnEnable() => _monsters = FindObjectsOfType<Monster>();
+
     private void Update()
     {
-        // ïåðåçàãðóçèòü ñöåíó ïðè íàæàòèè êíîïêè 
+        // Ð¿ÐµÑ€ÐµÐ·Ð°Ð³Ñ€ÑƒÐ·Ð¸Ñ‚ÑŒ ÑÑ†ÐµÐ½Ñƒ Ð¿Ñ€Ð¸ Ð½Ð°Ð¶Ð°Ñ‚Ð¸Ð¸ ÐºÐ½Ð¾Ð¿ÐºÐ¸ 
         if (Input.GetKeyDown(KeyCode.R))
-            Scene.ReloadScene(); // ñòàòè÷íûé ìåòîä êëàññà Scene
+            Scene.ReloadScene(); // ÑÑ‚Ð°Ñ‚Ð¸Ñ‡Ð½Ñ‹Ð¹ Ð¼ÐµÑ‚Ð¾Ð´ ÐºÐ»Ð°ÑÑÐ° Scene
 
-        // çàêðûòü ïðèëîæåíèå ïðè íàæàòèè êíîïêè
+        // Ð·Ð°ÐºÑ€Ñ‹Ñ‚ÑŒ Ð¿Ñ€Ð¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ð¿Ñ€Ð¸ Ð½Ð°Ð¶Ð°Ñ‚Ð¸Ð¸ ÐºÐ½Ð¾Ð¿ÐºÐ¸
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
+
+        if (!_showGameOverMessage)
+        {
+            if (batScript.respawned)
+            {
+                scoreText.SetText(batScript.BatCount.ToString());
+
+                foreach (Monster monster in _monsters)
+                {
+                    if (monster != null)
+                        return;
+                }
+                Debug.Log("It's all!");
+                _showGameOverMessage = true;
+            }
+        }
+    }
+
+    private void OnKillAllEnemies()
+    {
+        foreach (Monster monster in _monsters)
+        {
+            if (monster != null)
+                return;
+            else
+                _showGameOverMessage = true;
+
+            if (_showGameOverMessage)
+            {
+                Debug.Log("It's all!");
+                _showGameOverMessage = false;
+            }
+        }
+    }
+
+    public void SceneReloader() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+    public void MainLevelLoader() => SceneManager.LoadScene("StartScene");
+
+    public void LoadNextScene() => SceneManager.LoadScene("Level" + (currentLevelIndex + 1));
+
+    public void ShowOrHideButtons() => overlayAnimator.SetTrigger("Switch");
+
+    public void ShowOrHideToolTip(TMP_Text toolTip)
+    {
+        if (toolTip.alpha == 1)
+            toolTip.alpha = 0;
+        else
+            toolTip.alpha = 1;
     }
 }

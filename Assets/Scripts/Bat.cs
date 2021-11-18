@@ -3,8 +3,7 @@ using System.Collections;
 
 public class Bat : MonoBehaviour
 {
-    [Tooltip("Текущее расстояние от объекта до точки запуска")]
-    public float currentDistance = 0f; // текущее расстояние от объекта до точки "запуска"
+    public bool respawned; // переменная для проверки респавна
 
     private SpriteRenderer _cached_Renderer; // кешированный Renderer
     private Rigidbody2D _cached_Rigidbody; // кешированный Rigidbody
@@ -18,7 +17,6 @@ public class Bat : MonoBehaviour
     private Vector3 _projectilePosition; // позиция "запуска" объекта
     private bool _wasLaunched; // переменная для проверки "запуска"
     private bool _stretchSoundWasPlayed; // переменная для проверки проигрывания звука
-    private bool _respawned; // переменная для проверки респавна
     private float _timer; // отсчет времени после остановки объекта
     private float _worldBound = 30f; // границы мира
     private float _prelaunchFlySpeed = 8f; // начальная скорость объекта к позиции "запуска"
@@ -32,9 +30,15 @@ public class Bat : MonoBehaviour
     [SerializeField] private GameObject _startPoint; // начальная точка появления объекта
 
     [SerializeField]
+    [Tooltip("Текущее расстояние от объекта до точки запуска")]
+    private float currentDistance = 0f; // текущее расстояние от объекта до точки "запуска"
+
+    [SerializeField]
     [Range(50, 1000)]
     [Tooltip("Сила запуска")]
     private int _launchPower; // сила "запуска"
+
+    public int BatCount { get ; private set; }
 
     private void Awake()
     {
@@ -56,6 +60,7 @@ public class Bat : MonoBehaviour
         _slingshotScript.RubberBandJunctionPoint(_projectilePosition);
 
         StartCoroutine(nameof(Respawn)); // запустить респавн
+        BatCount = 0;
     }
 
     private IEnumerator Respawn()
@@ -91,7 +96,7 @@ public class Bat : MonoBehaviour
         else
             _timer = 0;
         // если объект не респавнился после "запуска"
-        if (!_respawned)
+        if (!respawned)
         {
             // если объект за пределами мира или время после его остановки вышло
             if (OutOfBounds() || TimeAfterStopIsUp())
@@ -100,7 +105,8 @@ public class Bat : MonoBehaviour
                 // создать префаб системы частиц на позиции объекта и уничтожить через определенное время
                 Destroy(Instantiate(_feathersParticlePrefab, transform.position, Quaternion.identity), 3);
                 StartCoroutine(nameof(Respawn)); // запустить корутину Respawn
-                _respawned = true; // считать объект зареспавненым, чтобы предотвратить многократное выполнение предшествующего кода
+                respawned = true; // считать объект зареспавненым, чтобы предотвратить многократное выполнение предшествующего кода
+                BatCount++;
             }
         }
     }
@@ -215,7 +221,7 @@ public class Bat : MonoBehaviour
             // "запуск" объекта по расчитанному направлению с заданной силой
             _cached_Rigidbody.AddForce(_directionToProjectilePosition * _launchPower);
             _wasLaunched = true; // считать, что объект был запущен
-            _respawned = false; // считать, что объект не был зареспавнен
+            respawned = false; // считать, что объект не был зареспавнен
         }
     }
 

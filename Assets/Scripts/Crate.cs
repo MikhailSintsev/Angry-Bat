@@ -2,19 +2,19 @@ using UnityEngine;
 
 public class Crate : MonoBehaviour
 {
-    private AudioSource _cached_AudioSource; // кешированный AudioSource объекта
-    private Rigidbody2D _cached_Rigidbody; // кешированный Rigidbody2D объекта
+    private AudioSource _cached_AudioSource; // РєРµС€РёСЂРѕРІР°РЅРЅС‹Р№ AudioSource РѕР±СЉРµРєС‚Р°
+    private Rigidbody2D _cached_Rigidbody; // РєРµС€РёСЂРѕРІР°РЅРЅС‹Р№ Rigidbody2D РѕР±СЉРµРєС‚Р°
 
     private void Awake()
     {
-        _cached_AudioSource = GetComponent<AudioSource>(); // кешировать AudioSource объекта
-        _cached_Rigidbody = GetComponent<Rigidbody2D>(); // кешировать Rigidbody2D объекта
+        _cached_AudioSource = GetComponent<AudioSource>(); // РєРµС€РёСЂРѕРІР°С‚СЊ AudioSource РѕР±СЉРµРєС‚Р°
+        _cached_Rigidbody = GetComponent<Rigidbody2D>(); // РєРµС€РёСЂРѕРІР°С‚СЊ Rigidbody2D РѕР±СЉРµРєС‚Р°
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // если скорость объекта после столкновения больше заданного числа и никакой звук не проигрывается
+        // РµСЃР»Рё СЃРєРѕСЂРѕСЃС‚СЊ РѕР±СЉРµРєС‚Р° РїРѕСЃР»Рµ СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ Р±РѕР»СЊС€Рµ Р·Р°РґР°РЅРЅРѕРіРѕ С‡РёСЃР»Р° Рё РЅРёРєР°РєРѕР№ Р·РІСѓРє РЅРµ РїСЂРѕРёРіСЂС‹РІР°РµС‚СЃСЏ
         if (_cached_Rigidbody.velocity.magnitude >= 1.5f && !_cached_AudioSource.isPlaying)
-            _cached_AudioSource.Play(); // проиграть звук столкновения
+            _cached_AudioSource.Play(); // РїСЂРѕРёРіСЂР°С‚СЊ Р·РІСѓРє СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ
     }
 }

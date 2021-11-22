@@ -2,59 +2,58 @@ using UnityEngine;
 
 public class Monster : MonoBehaviour
 {
-    [SerializeField] private GameObject _cloudParticlePrefab; // ссылка на префаб системы частиц
+    [SerializeField] private GameObject _cloudParticlePrefab; // СЃСЃС‹Р»РєР° РЅР° РїСЂРµС„Р°Р± СЃРёСЃС‚РµРјС‹ С‡Р°СЃС‚РёС†
 
-    private Rigidbody2D _cached_Rigidbody; // кешированный Rigidbody2D объекта
-    private AudioSource _cached_AudioSource; // кешированный AudioSource объекта
-    private bool _isFalling; // проверка падения объекта
+    private Rigidbody2D _cached_Rigidbody; // РєРµС€РёСЂРѕРІР°РЅРЅС‹Р№ Rigidbody2D РѕР±СЉРµРєС‚Р°
+    private AudioSource _cached_AudioSource; // РєРµС€РёСЂРѕРІР°РЅРЅС‹Р№ AudioSource РѕР±СЉРµРєС‚Р°
+    private bool _isFalling; // РїСЂРѕРІРµСЂРєР° РїР°РґРµРЅРёСЏ РѕР±СЉРµРєС‚Р°
 
     private void Awake()
     {
-        _cached_Rigidbody = GetComponent<Rigidbody2D>(); // кешировать Rigidbody2D
-        _cached_AudioSource = GetComponent<AudioSource>(); // кешировать AudioSource объекта
+        _cached_Rigidbody = GetComponent<Rigidbody2D>(); // РєРµС€РёСЂРѕРІР°С‚СЊ Rigidbody2D
+        _cached_AudioSource = GetComponent<AudioSource>(); // РєРµС€РёСЂРѕРІР°С‚СЊ AudioSource РѕР±СЉРµРєС‚Р°
     }
 
     private void Update()
     {
-        // если скорость объекта больше или равна заданному числу
+        // РµСЃР»Рё СЃРєРѕСЂРѕСЃС‚СЊ РѕР±СЉРµРєС‚Р° Р±РѕР»СЊС€Рµ РёР»Рё СЂР°РІРЅР° Р·Р°РґР°РЅРЅРѕРјСѓ С‡РёСЃР»Сѓ
         if (_cached_Rigidbody.velocity.magnitude >= 4f)
-            _isFalling = true; // считать, что объект падает
+            _isFalling = true; // СЃС‡РёС‚Р°С‚СЊ, С‡С‚Рѕ РѕР±СЉРµРєС‚ РїР°РґР°РµС‚
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Bat bat = collision.collider.GetComponent<Bat>(); // пытаться получить скрипт Bat у объекта столкновения
-        Debug.Log(collision.contacts[0].normal);
+        Bat bat = collision.collider.GetComponent<Bat>(); // РїС‹С‚Р°С‚СЊСЃСЏ РїРѕР»СѓС‡РёС‚СЊ СЃРєСЂРёРїС‚ Bat Сѓ РѕР±СЉРµРєС‚Р° СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ
 
-        // если скрипт не получен, скороть объекта больше заданного числа и звук не проигрывается объектом
+        // РµСЃР»Рё СЃРєСЂРёРїС‚ РЅРµ РїРѕР»СѓС‡РµРЅ, СЃРєРѕСЂРѕС‚СЊ РѕР±СЉРµРєС‚Р° Р±РѕР»СЊС€Рµ Р·Р°РґР°РЅРЅРѕРіРѕ С‡РёСЃР»Р° Рё Р·РІСѓРє РЅРµ РїСЂРѕРёРіСЂС‹РІР°РµС‚СЃСЏ РѕР±СЉРµРєС‚РѕРј
         if (bat == null && _cached_Rigidbody.velocity.magnitude >= 0.3f && !_cached_AudioSource.isPlaying)
         {
-            _cached_AudioSource.Play(); // проиграть звук
+            _cached_AudioSource.Play(); // РїСЂРѕРёРіСЂР°С‚СЊ Р·РІСѓРє
         }
 
-        // если скрипт получен
+        // РµСЃР»Рё СЃРєСЂРёРїС‚ РїРѕР»СѓС‡РµРЅ
         if (bat != null)
         {
-            Die(); // выполнить метод Die()
-            return; // и выйти из метода OnCollisionEnter2D
+            Die(); // РІС‹РїРѕР»РЅРёС‚СЊ РјРµС‚РѕРґ Die()
+            return; // Рё РІС‹Р№С‚Рё РёР· РјРµС‚РѕРґР° OnCollisionEnter2D
         }
 
-        // если объект падает
+        // РµСЃР»Рё РѕР±СЉРµРєС‚ РїР°РґР°РµС‚
         if (_isFalling)
         {
-            Die(); // выполнить метод Die()
-            return; // и выйти из метода OnCollisionEnter2D
+            Die(); // РІС‹РїРѕР»РЅРёС‚СЊ РјРµС‚РѕРґ Die()
+            return; // Рё РІС‹Р№С‚Рё РёР· РјРµС‚РѕРґР° OnCollisionEnter2D
         }
 
-        // если нормаль объекта столкновения к данному объекту по оси Y меньше заданного значения (на объект что то падает)
+        // РµСЃР»Рё РЅРѕСЂРјР°Р»СЊ РѕР±СЉРµРєС‚Р° СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ Рє РґР°РЅРЅРѕРјСѓ РѕР±СЉРµРєС‚Сѓ РїРѕ РѕСЃРё Y РјРµРЅСЊС€Рµ Р·Р°РґР°РЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ (РЅР° РѕР±СЉРµРєС‚ С‡С‚Рѕ С‚Рѕ РїР°РґР°РµС‚)
         if (collision.contacts[0].normal.y < -0.5f)
-            Die(); // выполнить метод Die()
+            Die(); // РІС‹РїРѕР»РЅРёС‚СЊ РјРµС‚РѕРґ Die()
     } 
     
     private void Die()
     {
-        // создать систему частиц на основе префаба и уничтожить через заданное время
+        // СЃРѕР·РґР°С‚СЊ СЃРёСЃС‚РµРјСѓ С‡Р°СЃС‚РёС† РЅР° РѕСЃРЅРѕРІРµ РїСЂРµС„Р°Р±Р° Рё СѓРЅРёС‡С‚РѕР¶РёС‚СЊ С‡РµСЂРµР· Р·Р°РґР°РЅРЅРѕРµ РІСЂРµРјСЏ
         Destroy(Instantiate(_cloudParticlePrefab, transform.position, Quaternion.identity), 3);
-        Destroy(gameObject); // уничтожить объект
+        Destroy(gameObject); // СѓРЅРёС‡С‚РѕР¶РёС‚СЊ РѕР±СЉРµРєС‚
     }
 }

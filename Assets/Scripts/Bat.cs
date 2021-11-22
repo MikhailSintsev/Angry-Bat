@@ -3,8 +3,8 @@ using System.Collections;
 
 public class Bat : MonoBehaviour
 {
-    [Tooltip("Текущее расстояние от объекта до точки запуска")]
-    public float currentDistance = 0f; // текущее расстояние от объекта до точки "запуска"
+    public bool respawned; // переменная для проверки респавна
+    public bool stopRespawns;
 
     private SpriteRenderer _cached_Renderer; // кешированный Renderer
     private Rigidbody2D _cached_Rigidbody; // кешированный Rigidbody
@@ -16,14 +16,14 @@ public class Bat : MonoBehaviour
 
     private Vector3 _directionToProjectilePosition; // направление к позиции "запуска" объекта
     private Vector3 _projectilePosition; // позиция "запуска" объекта
-    private bool _wasLaunched; // переменная для проверки "запуска"
     private bool _stretchSoundWasPlayed; // переменная для проверки проигрывания звука
-    private bool _respawned; // переменная для проверки респавна
     private float _timer; // отсчет времени после остановки объекта
     private float _worldBound = 30f; // границы мира
     private float _prelaunchFlySpeed = 8f; // начальная скорость объекта к позиции "запуска"
     private float _maxDragDistance = 1.5f; // максимальное расстояние перетаскивания объекта от позиции "запуска"
+    private int _maxBatCount = 99;
 
+    [SerializeField] private bool _wasLaunched; // переменная для проверки "запуска"
     [SerializeField] private AudioClip _bat_fly; // звук "запуска"
     [SerializeField] private AudioClip _stretch; // звук натяжения резиновой ленты
 
@@ -32,9 +32,15 @@ public class Bat : MonoBehaviour
     [SerializeField] private GameObject _startPoint; // начальная точка появления объекта
 
     [SerializeField]
+    [Tooltip("Текущее расстояние от объекта до точки запуска")]
+    private float currentDistance = 0f; // текущее расстояние от объекта до точки "запуска"
+
+    [SerializeField]
     [Range(50, 1000)]
     [Tooltip("Сила запуска")]
     private int _launchPower; // сила "запуска"
+
+    public int BatCount { get; private set; }
 
     private void Awake()
     {
@@ -48,14 +54,16 @@ public class Bat : MonoBehaviour
 
     private void Start()
     {
+        stopRespawns = false;
         // получить коллайдер объекта Slingshot, кешированный в скрипте Slingshot
-        _cached_StickCollider = _slingshotScript.Cached_StickCollider; 
+        _cached_StickCollider = _slingshotScript.Cached_StickCollider;
         // получить позицию "запуска", используя дочерний объект ProjectilePosition объекта Slingshot
         _projectilePosition = _slingshot.transform.Find("ProjectilePosition").position;
         // присвоить точке соединения двух LineRenderer (отрисовка резиновой ленты) координаты точки "запуска"
         _slingshotScript.RubberBandJunctionPoint(_projectilePosition);
 
         StartCoroutine(nameof(Respawn)); // запустить респавн
+        BatCount = 0;
     }
 
     private IEnumerator Respawn()
@@ -64,12 +72,17 @@ public class Bat : MonoBehaviour
         /* Переместить объект по вертикали за пределы экрана. Таким образом, объект будет исчезать со сцены
          * и появляться с задержкой (и задержит камеру во время проигрывания системы частиц после исчезания объекта). */
         transform.position = new Vector3(transform.position.x, _startPoint.transform.position.y);
-        yield return new WaitForSeconds(0.6f);
+
+        if (stopRespawns)
+            yield break;
+
+        yield return new WaitForSeconds(1f);
 
         _wasLaunched = false; // объект не был запущен
         _stretchSoundWasPlayed = false; // звук натяжения резиновой ленты не был проигран
         transform.SetPositionAndRotation(_startPoint.transform.position, _startPoint.transform.rotation); // изменить позицию и ротацию объекта на исходные
         _cached_Animator.SetBool("CanFly", true); // проигрывать анимацию полета
+        respawned = true;
 
         yield return new WaitForSeconds(0.4f);
 
@@ -91,7 +104,7 @@ public class Bat : MonoBehaviour
         else
             _timer = 0;
         // если объект не респавнился после "запуска"
-        if (!_respawned)
+        if (_wasLaunched)
         {
             // если объект за пределами мира или время после его остановки вышло
             if (OutOfBounds() || TimeAfterStopIsUp())
@@ -100,13 +113,14 @@ public class Bat : MonoBehaviour
                 // создать префаб системы частиц на позиции объекта и уничтожить через определенное время
                 Destroy(Instantiate(_feathersParticlePrefab, transform.position, Quaternion.identity), 3);
                 StartCoroutine(nameof(Respawn)); // запустить корутину Respawn
-                _respawned = true; // считать объект зареспавненым, чтобы предотвратить многократное выполнение предшествующего кода
+                //respawned = true; // считать объект зареспавненым, чтобы предотвратить многократное выполнение предшествующего кода
+                _wasLaunched = false;
             }
         }
     }
 
     private bool OutOfBounds()
-    { 
+    {
         // если объект за пределами границ по горизонтали или вертикали
         if (transform.position.x <= -_worldBound
             || transform.position.x >= _worldBound
@@ -132,7 +146,7 @@ public class Bat : MonoBehaviour
     {
         // остановить корутину, чтобы прекратить попытки объекта переместиться в _projectilePosition
         StopCoroutine(nameof(Respawn));
-        
+
         if (!_wasLaunched) // если объект не был "запущен"
         {
             _cached_Renderer.color = Color.red; // изменить цвет объекта
@@ -145,7 +159,7 @@ public class Bat : MonoBehaviour
         if (!_wasLaunched)
         {
             // проиграть звук натяжения резиновой ленты, если он не был проигран
-            if (!_stretchSoundWasPlayed) 
+            if (!_stretchSoundWasPlayed)
             {
                 _cached_AudioSource.PlayOneShot(_stretch, 0.5f);
                 _stretchSoundWasPlayed = true;
@@ -215,7 +229,12 @@ public class Bat : MonoBehaviour
             // "запуск" объекта по расчитанному направлению с заданной силой
             _cached_Rigidbody.AddForce(_directionToProjectilePosition * _launchPower);
             _wasLaunched = true; // считать, что объект был запущен
-            _respawned = false; // считать, что объект не был зареспавнен
+            respawned = false; // считать, что объект не был зареспавнен
+
+            if (BatCount < _maxBatCount)
+                BatCount++;
+            else
+                BatCount = 99;
         }
     }
 

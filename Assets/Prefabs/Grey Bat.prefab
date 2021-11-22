@@ -155,7 +155,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 2
   m_GravityScale: 0
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 0bb29503912f6a747b1ba253446099c1, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
@@ -172,12 +172,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 012d7d09db2a28d4daabaa01625bba6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distance: 0
+  respawned: 0
+  stopRespawns: 0
   _bat_fly: {fileID: 8300000, guid: 12567623c7fe22d4388e409360f0305d, type: 3}
   _stretch: {fileID: 8300000, guid: 28bc358e58d9384448f4b8f2481537c9, type: 3}
   _feathersParticlePrefab: {fileID: 7958105315944863435, guid: 02538f21347e6384e8d49b71c7dbb650, type: 3}
   _slingshot: {fileID: 0}
   _startPoint: {fileID: 0}
+  currentDistance: 0
   _launchPower: 480
 --- !u!82 &421834711
 AudioSource:

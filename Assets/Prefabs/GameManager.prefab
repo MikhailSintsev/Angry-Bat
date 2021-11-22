@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2177522015574834710}
   - component: {fileID: 2177522015574834705}
-  - component: {fileID: 2177522015574834711}
+  - component: {fileID: 692411870}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -44,7 +44,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b619fc32bdc49b24c865aef7dec912e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2177522015574834711
+  currentLevelIndex: 5
+  theNextLevelExists: 1
+  overlayAnimator: {fileID: 0}
+  batScript: {fileID: 0}
+  scoreText: {fileID: 0}
+  centerMessage: {fileID: 0}
+  exitMessage: {fileID: 0}
+  topMessage: {fileID: 0}
+--- !u!114 &692411870
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -53,7 +61,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 2177522015574834704}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69424b31b7a7ca84c92d9b28e5fb3cee, type: 3}
+  m_Script: {fileID: 11500000, guid: f6fb6958ccf899e48a734f0291193b18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxLevel: 1

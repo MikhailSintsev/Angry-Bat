@@ -1438,6 +1438,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 692411871}
+    - target: {fileID: 6379788146232934774, guid: 6b420de51653cf746acc275aec622101, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ShowOrHideExitMessage
+      objectReference: {fileID: 0}
     - target: {fileID: 6379788146380983016, guid: 6b420de51653cf746acc275aec622101, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 

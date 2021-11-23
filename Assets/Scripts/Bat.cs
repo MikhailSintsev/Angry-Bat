@@ -3,8 +3,8 @@ using System.Collections;
 
 public class Bat : MonoBehaviour
 {
-    public bool respawned; // переменная для проверки респавна
-    public bool stopRespawns;
+    public bool respawned; // проверка респавна
+    public bool stopRespawns; // проверка необходимости остановки респавна
 
     private SpriteRenderer _cached_Renderer; // кешированный Renderer
     private Rigidbody2D _cached_Rigidbody; // кешированный Rigidbody
@@ -21,7 +21,7 @@ public class Bat : MonoBehaviour
     private float _worldBound = 30f; // границы мира
     private float _prelaunchFlySpeed = 8f; // начальная скорость объекта к позиции "запуска"
     private float _maxDragDistance = 1.5f; // максимальное расстояние перетаскивания объекта от позиции "запуска"
-    private int _maxBatCount = 99;
+    private int _maxBatCount = 99; // максимальное количество полученных очков
 
     [SerializeField] private bool _wasLaunched; // переменная для проверки "запуска"
     [SerializeField] private AudioClip _bat_fly; // звук "запуска"
@@ -40,7 +40,7 @@ public class Bat : MonoBehaviour
     [Tooltip("Сила запуска")]
     private int _launchPower; // сила "запуска"
 
-    public int BatCount { get; private set; }
+    public int BatCount { get; private set; } // свойства для получения/установки количества очков
 
     private void Awake()
     {
@@ -63,7 +63,7 @@ public class Bat : MonoBehaviour
         _slingshotScript.RubberBandJunctionPoint(_projectilePosition);
 
         StartCoroutine(nameof(Respawn)); // запустить респавн
-        BatCount = 0;
+        BatCount = 0; // установить количество очков при старте
     }
 
     private IEnumerator Respawn()
@@ -73,7 +73,7 @@ public class Bat : MonoBehaviour
          * и появляться с задержкой (и задержит камеру во время проигрывания системы частиц после исчезания объекта). */
         transform.position = new Vector3(transform.position.x, _startPoint.transform.position.y);
 
-        if (stopRespawns)
+        if (stopRespawns) // если stopRespawns=true, остановить выполнение корутины
             yield break;
 
         yield return new WaitForSeconds(1f);
@@ -82,7 +82,7 @@ public class Bat : MonoBehaviour
         _stretchSoundWasPlayed = false; // звук натяжения резиновой ленты не был проигран
         transform.SetPositionAndRotation(_startPoint.transform.position, _startPoint.transform.rotation); // изменить позицию и ротацию объекта на исходные
         _cached_Animator.SetBool("CanFly", true); // проигрывать анимацию полета
-        respawned = true;
+        respawned = true; // считать, что объект зареспавнен
 
         yield return new WaitForSeconds(0.4f);
 
@@ -231,16 +231,14 @@ public class Bat : MonoBehaviour
             _wasLaunched = true; // считать, что объект был запущен
             respawned = false; // считать, что объект не был зареспавнен
 
+            // прибавлять количество очков, пока не будет достигнуто максимальное количество 
             if (BatCount < _maxBatCount)
                 BatCount++;
             else
-                BatCount = 99;
+                BatCount = _maxBatCount;
         }
     }
 
-    // при пересечинии с любым коллайдером остановить анимацию полета
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        _cached_Animator.SetBool("CanFly", false);
-    }
+    // при пересечении с любым коллайдером остановить анимацию полета
+    private void OnCollisionEnter2D(Collision2D collision) => _cached_Animator.SetBool("CanFly", false);
 }

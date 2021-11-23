@@ -26,7 +26,7 @@ public class Monster : MonoBehaviour
         Bat bat = collision.collider.GetComponent<Bat>(); // пытаться получить скрипт Bat у объекта столкновения
 
         // если скрипт не получен, скороть объекта больше заданного числа и звук не проигрывается объектом
-        if (bat == null && _cached_Rigidbody.velocity.magnitude >= 0.3f && !_cached_AudioSource.isPlaying)
+        if (_cached_AudioSource.isActiveAndEnabled && bat == null && _cached_Rigidbody.velocity.magnitude >= 0.3f && !_cached_AudioSource.isPlaying)
         {
             _cached_AudioSource.Play(); // проиграть звук
         }

@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     private Monster[] _monsters; // создание массива монстров
     private bool _showGameOverMessage; // проверка необходимости показать сообщение о конце игры
     private bool _canShowExitMessage; // проверка необходимости показать сообщение о выходе в главное меню
+    private bool _levelComplete; // проверка завершения уровня
 
     // заполнение массива монстров при запуске игры
     private void OnEnable() => _monsters = FindObjectsOfType<Monster>();
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour
     {
         _canShowExitMessage = true; // задать начальное значение
         _showGameOverMessage = false; // задать начальное значение
+        _levelComplete = false; // задать начальное значение
         SetCurrentLevelTextMessage(); // отобразить номер уровня
         SetScore(); // отобразить начальное количество очков (0)
         //highScoreText.SetText("Best: " + _highScore);
@@ -43,8 +45,9 @@ public class GameManager : MonoBehaviour
             ShowOrHideExitMessage();
 
         SetScore(); // отобразить количество очков
+        batScript.stopRespawns = _levelComplete;
 
-        if (!_showGameOverMessage) // если сообщение о конце игры не должно быть показано
+        if (!_showGameOverMessage) // если сообщение о конце игры не было показано
         {
             // проверять каждый элемент массива на null
             foreach (Monster monster in _monsters)
@@ -53,9 +56,10 @@ public class GameManager : MonoBehaviour
                 if (monster != null)
                     return;
             }
-            batScript.stopRespawns = true; // остановить респавны
+            //batScript.stopRespawns = true; // остановить респавны
             Debug.Log("It's all!"); // сообщение в консоль
             StartCoroutine(nameof(LevelComplete)); // запустить корутину завершения уровня
+            _levelComplete = true;
             _showGameOverMessage = true; // поменять значение, чтобы предотвратить повторное выполнение предыдущего кода
         }
     }
@@ -83,25 +87,29 @@ public class GameManager : MonoBehaviour
             StartCoroutine(nameof(SorryMessage));
     }
 
-    // активировать триггер аниматора Overlay Canvas
-    public void ShowOrHideButtons() => overlayAnimator.SetTrigger("Switch");
+    public void ShowOrHideButtons()
+    {
+        if (_canShowExitMessage) // если меню выхода не показано 
+            overlayAnimator.SetTrigger("Switch"); // активировать триггер аниматора Overlay Canvas
+    }
 
     // показать/скрыть меню выхода в главное меню
     public void ShowOrHideExitMessage()
     {
-        if (_canShowExitMessage) // если необходимо показать меню выхода
+        if (_canShowExitMessage) // если меню выхода не показано
         {
-            centerMessage.alpha = 0; // сделать центральное сообщение прозрачным
-            overlayAnimator.SetTrigger("Exit"); // активировать триггер аниматора Overlay Canvas
+            if (_levelComplete) // и если уровень завершен
+                overlayAnimator.SetBool("Level Complete", false); // скрыть сообщение о завершении уровня
+            overlayAnimator.SetBool("Exit", true);
             _canShowExitMessage = false;
         }
         else
         {
-            overlayAnimator.SetTrigger("Cancel Exit"); // активировать триггер аниматора Overlay Canvas
-            _canShowExitMessage = true;
+            overlayAnimator.SetBool("Exit", false);
             // возвращать непрозрачность центрального текста, если респавны остановлены (игра окончена)
-            if (batScript.stopRespawns == true)
-                centerMessage.alpha = 1;
+            if (_levelComplete)
+                overlayAnimator.SetBool("Level Complete", true);
+            _canShowExitMessage = true;
         }
     }
 
@@ -124,10 +132,14 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator LevelComplete()
     {
-        yield return new WaitForSeconds(5f); // подождать заданное количество времени
+        yield return new WaitForSeconds(3f); // подождать заданное количество времени
         // написать, что уровень завершен (с указанием номера уровня)
         centerMessage.SetText("Level " + currentLevelIndex + " Completed");
-        centerMessage.alpha = 1; // сделать текст непрозрачным
+
+        if (_canShowExitMessage) // если меню выхода не показано
+            overlayAnimator.SetBool("Level Complete", true); // показать сообщение о завершении уровня
+        else // иначе скрыть сообщение
+            overlayAnimator.SetBool("Level Complete", false);
 
         //if (_highScore < batScript.BatCount)
         //{

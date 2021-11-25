@@ -17,6 +17,7 @@ public class Bat : MonoBehaviour
     private Vector3 _directionToProjectilePosition; // направление к позиции "запуска" объекта
     private Vector3 _projectilePosition; // позиция "запуска" объекта
     private bool _stretchSoundWasPlayed; // переменная для проверки проигрывания звука
+    private bool _blowUp; // проверка необходимости взрыва объекта
     private float _timer; // отсчет времени после остановки объекта
     private float _worldBound = 30f; // границы мира
     private float _prelaunchFlySpeed = 8f; // начальная скорость объекта к позиции "запуска"
@@ -54,6 +55,7 @@ public class Bat : MonoBehaviour
 
     private void Start()
     {
+        _blowUp = false;
         stopRespawns = false;
         // получить коллайдер объекта Slingshot, кешированный в скрипте Slingshot
         _cached_StickCollider = _slingshotScript.Cached_StickCollider;
@@ -68,6 +70,8 @@ public class Bat : MonoBehaviour
 
     private IEnumerator Respawn()
     {
+        _cached_Rigidbody.constraints = RigidbodyConstraints2D.None;
+        _blowUp = false;
         _cached_Rigidbody.gravityScale = 0; // отключить гравитацию, чтобы объект не упал с начальной позиции
         /* Переместить объект по вертикали за пределы экрана. Таким образом, объект будет исчезать со сцены
          * и появляться с задержкой (и задержит камеру во время проигрывания системы частиц после исчезания объекта). */
@@ -106,14 +110,13 @@ public class Bat : MonoBehaviour
         // если объект не респавнился после "запуска"
         if (_wasLaunched)
         {
-            // если объект за пределами мира или время после его остановки вышло
-            if (OutOfBounds() || TimeAfterStopIsUp())
+            // если объект за пределами мира, время после его остановки вышло или нужно взорвать его по клику
+            if (OutOfBounds() || TimeAfterStopIsUp() || _blowUp)
             {
                 _cached_Rigidbody.constraints = RigidbodyConstraints2D.None; // разрешить объекту двигаться и вращаться
                 // создать префаб системы частиц на позиции объекта и уничтожить через определенное время
                 Destroy(Instantiate(_feathersParticlePrefab, transform.position, Quaternion.identity), 3);
                 StartCoroutine(nameof(Respawn)); // запустить корутину Respawn
-                //respawned = true; // считать объект зареспавненым, чтобы предотвратить многократное выполнение предшествующего кода
                 _wasLaunched = false;
             }
         }
@@ -137,7 +140,7 @@ public class Bat : MonoBehaviour
     // вернуть true, если значение переменной _timer больше заданного
     private bool TimeAfterStopIsUp()
     {
-        if (_timer >= 3)
+        if (_timer >= 1.5f)
             return true;
         return false;
     }
@@ -148,10 +151,7 @@ public class Bat : MonoBehaviour
         StopCoroutine(nameof(Respawn));
 
         if (!_wasLaunched) // если объект не был "запущен"
-        {
             _cached_Renderer.color = Color.red; // изменить цвет объекта
-            //_cached_Animator.enabled = true;
-        }
     }
 
     private void OnMouseDrag()
@@ -236,6 +236,11 @@ public class Bat : MonoBehaviour
                 BatCount++;
             else
                 BatCount = _maxBatCount;
+        }
+        else
+        {
+            _cached_Rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
+            _blowUp = true; // объект нужно взорвать
         }
     }
 

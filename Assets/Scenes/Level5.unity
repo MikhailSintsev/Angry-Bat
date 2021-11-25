@@ -1614,6 +1614,22 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: MainLevelLoader
       objectReference: {fileID: 0}
+    - target: {fileID: 850158352, guid: 6b420de51653cf746acc275aec622101, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 692411871}
+    - target: {fileID: 850158352, guid: 6b420de51653cf746acc275aec622101, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LoadNextScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 1194544380, guid: 6b420de51653cf746acc275aec622101, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 692411871}
+    - target: {fileID: 1194544380, guid: 6b420de51653cf746acc275aec622101, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: MainLevelLoader
+      objectReference: {fileID: 0}
     - target: {fileID: 1775301813, guid: 6b420de51653cf746acc275aec622101, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
